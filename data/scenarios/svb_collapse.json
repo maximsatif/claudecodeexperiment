@@ -1,0 +1,56 @@
+{
+  "name": "SVB Collapse Scenario",
+  "description": "Simulates the March 2023 Silicon Valley Bank collapse and regional banking contagion",
+  "date": "2023-03-10",
+  "trigger": {
+    "entity": "SCHW",
+    "event": "Regional bank experiences rapid deposit outflows and forced asset sales",
+    "initial_shock_magnitude": 0.65
+  },
+  "market_shocks": {
+    "SCHW": -0.35,
+    "USB": -0.20,
+    "PNC": -0.15,
+    "TFC": -0.25,
+    "FITB": -0.22,
+    "JPM": -0.08,
+    "BAC": -0.15,
+    "C": -0.12,
+    "GS": -0.06,
+    "MS": -0.07,
+    "WFC": -0.10,
+    "SPY": -0.05,
+    "QQQ": -0.04,
+    "TLT": 0.08,
+    "HYG": -0.10,
+    "LQD": -0.05,
+    "GLD": 0.05,
+    "UVXY": 0.45
+  },
+  "contagion_pathway": [
+    "SCHW (initial shock: deposit flight)",
+    "→ TFC, FITB, USB (regional bank contagion via shared depositor base)",
+    "→ BAC, WFC (large bank contagion via market confidence)",
+    "→ HYG (credit spread widening across financial sector)",
+    "→ SPY (broad market selloff on systemic risk fears)"
+  ],
+  "margin_impact": {
+    "portfolio_loss_pct": -12.5,
+    "margin_call_triggered": true,
+    "margin_shortfall": 850000,
+    "time_to_margin_call_hours": 4
+  },
+  "macro_conditions": {
+    "VIX": 29.5,
+    "credit_spread_bps": 185,
+    "treasury_10y": 3.55,
+    "fed_funds": 4.75
+  },
+  "key_indicators": [
+    "Deposit flight accelerating across regional banks",
+    "Interbank lending rates spiking",
+    "Credit default swap spreads widening for financial sector",
+    "Flight to quality: Treasury rally, gold up",
+    "Volatility spike: VIX approaching 30"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "name": "COVID-19 Market Crash Scenario",
+  "description": "Simulates the March 2020 pandemic-driven market crash with cross-asset contagion",
+  "date": "2020-03-16",
+  "trigger": {
+    "entity": "SPY",
+    "event": "Global pandemic triggers unprecedented broad-based market selloff",
+    "initial_shock_magnitude": 0.90
+  },
+  "market_shocks": {
+    "SPY": -0.34,
+    "QQQ": -0.28,
+    "IWM": -0.40,
+    "EFA": -0.33,
+    "EEM": -0.32,
+    "JPM": -0.35,
+    "BAC": -0.40,
+    "C": -0.42,
+    "GS": -0.30,
+    "MS": -0.32,
+    "WFC": -0.38,
+    "SCHW": -0.35,
+    "USB": -0.33,
+    "TLT": 0.12,
+    "HYG": -0.18,
+    "LQD": -0.12,
+    "AGG": -0.05,
+    "GLD": -0.03,
+    "USO": -0.55,
+    "BITO": -0.50,
+    "UVXY": 3.00
+  },
+  "contagion_pathway": [
+    "Global equity markets (SPY, QQQ, IWM - broad selloff)",
+    "→ Financial sector (JPM, BAC, C - credit risk repricing)",
+    "→ Credit markets (HYG, LQD - corporate bond selloff, liquidity crisis)",
+    "→ Commodities (USO - demand destruction, oil price war)",
+    "→ Emerging markets (EEM - capital flight to safety)",
+    "→ Even safe havens temporarily affected (GLD down on margin calls)"
+  ],
+  "margin_impact": {
+    "portfolio_loss_pct": -32.8,
+    "margin_call_triggered": true,
+    "margin_shortfall": 3200000,
+    "time_to_margin_call_hours": 1
+  },
+  "macro_conditions": {
+    "VIX": 82.69,
+    "credit_spread_bps": 650,
+    "treasury_10y": 0.73,
+    "fed_funds": 0.25
+  },
+  "key_indicators": [
+    "Circuit breakers triggered multiple times",
+    "VIX at all-time highs above 80",
+    "Credit markets frozen - no bid for corporate bonds",
+    "Oil price collapse on demand destruction",
+    "Central bank emergency rate cuts and QE",
+    "Correlation of all risk assets approaching 1.0"
+  ]
+}

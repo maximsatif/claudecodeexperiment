@@ -1,0 +1,28 @@
+{
+  "name": "Demo Portfolio - Diversified Financial Services",
+  "description": "A sample clearing member portfolio for demonstrating margin risk analysis",
+  "total_notional": 10500000,
+  "positions": [
+    {"ticker": "JPM", "shares": 10000, "avg_cost": 180.00, "asset_class": "Equity", "sector": "Major Banks"},
+    {"ticker": "BAC", "shares": 15000, "avg_cost": 35.00, "asset_class": "Equity", "sector": "Major Banks"},
+    {"ticker": "GS", "shares": 5000, "avg_cost": 400.00, "asset_class": "Equity", "sector": "Major Banks"},
+    {"ticker": "C", "shares": 12000, "avg_cost": 55.00, "asset_class": "Equity", "sector": "Major Banks"},
+    {"ticker": "MS", "shares": 8000, "avg_cost": 90.00, "asset_class": "Equity", "sector": "Major Banks"},
+    {"ticker": "SPY", "shares": 3000, "avg_cost": 480.00, "asset_class": "Equity", "sector": "Index"},
+    {"ticker": "TLT", "shares": 5000, "avg_cost": 95.00, "asset_class": "Fixed Income", "sector": "Treasuries"},
+    {"ticker": "HYG", "shares": 10000, "avg_cost": 75.00, "asset_class": "Fixed Income", "sector": "High Yield"},
+    {"ticker": "GLD", "shares": 2000, "avg_cost": 190.00, "asset_class": "Commodity", "sector": "Precious Metals"}
+  ],
+  "margin_parameters": {
+    "initial_margin_pct": 0.50,
+    "maintenance_margin_pct": 0.25,
+    "concentration_limit_pct": 0.30,
+    "sector_limit_pct": 0.40
+  },
+  "risk_limits": {
+    "max_var_95_pct": 5.0,
+    "max_drawdown_pct": 15.0,
+    "max_leverage": 2.0,
+    "min_liquidity_buffer": 500000
+  }
+}
