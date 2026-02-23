@@ -14,6 +14,8 @@ from backend.config import (
     FRED_API_KEY,
     FINNHUB_API_KEY,
     FRED_SERIES,
+    RISK_KEYWORDS,
+    POSITIVE_KEYWORDS,
 )
 
 
@@ -209,6 +211,37 @@ class NewsFetcher:
         except Exception as e:
             print(f"Error fetching market news: {e}")
             return []
+
+    async def get_batch_sentiment_scores(
+        self,
+        tickers: list[str],
+        days_back: int = 3,
+    ) -> dict[str, float]:
+        """Compute keyword-based sentiment scores for a batch of tickers.
+
+        Returns dict mapping ticker -> sentiment_score (-1 to +1).
+        Defaults to 0.0 (neutral) when news is unavailable.
+        """
+        scores: dict[str, float] = {}
+        for ticker in tickers:
+            try:
+                articles = await self.get_company_news(ticker, days_back=days_back)
+                if not articles:
+                    scores[ticker] = 0.0
+                    continue
+
+                pos_count = 0
+                neg_count = 0
+                for article in articles:
+                    text = f"{article.get('headline', '')} {article.get('summary', '')}".lower()
+                    pos_count += sum(1 for w in POSITIVE_KEYWORDS if w in text)
+                    neg_count += sum(1 for w in RISK_KEYWORDS if w in text)
+
+                total = pos_count + neg_count
+                scores[ticker] = round((pos_count - neg_count) / total, 2) if total > 0 else 0.0
+            except Exception:
+                scores[ticker] = 0.0
+        return scores
 
     def _get_fallback_news(self, ticker: str) -> list[dict]:
         """Return empty news when API is unavailable."""

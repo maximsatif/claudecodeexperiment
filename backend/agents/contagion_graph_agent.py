@@ -8,8 +8,8 @@ from typing import Any
 from strands import Agent, tool
 from strands.models import BedrockModel
 
-from backend.config import BEDROCK_MODEL_ID, AWS_REGION, CORRELATION_THRESHOLD
-from backend.services.data_fetcher import market_data_fetcher
+from backend.config import BEDROCK_MODEL_ID, AWS_REGION, CORRELATION_THRESHOLD, MONITORED_TICKERS
+from backend.services.data_fetcher import market_data_fetcher, news_fetcher
 from backend.services.graph_builder import (
     build_contagion_graph,
     simulate_contagion_spread,
@@ -19,7 +19,7 @@ from backend.models.contagion import FinancialSIRModel, SIRParameters
 
 @tool
 def build_graph(correlation_period: str = "6mo", threshold: float = 0.6) -> str:
-    """Build the contagion graph from current market data and correlations.
+    """Build the contagion graph from current market data, correlations, and news sentiment.
 
     Args:
         correlation_period: Period for correlation calculation (e.g., '3mo', '6mo', '1y').
@@ -31,7 +31,14 @@ def build_graph(correlation_period: str = "6mo", threshold: float = 0.6) -> str:
     if corr_matrix.empty:
         return json.dumps({"error": "Unable to build graph - no correlation data"})
 
-    graph = build_contagion_graph(corr_matrix, market_data, threshold=threshold)
+    # Fetch sentiment scores for monitored tickers
+    try:
+        import asyncio
+        sentiment_data = asyncio.run(news_fetcher.get_batch_sentiment_scores(MONITORED_TICKERS))
+    except Exception:
+        sentiment_data = {}
+
+    graph = build_contagion_graph(corr_matrix, market_data, threshold=threshold, sentiment_data=sentiment_data)
 
     return json.dumps({
         "nodes_count": len(graph.nodes),
@@ -69,7 +76,14 @@ def simulate_shock(
     if corr_matrix.empty:
         return json.dumps({"error": "Unable to simulate - no data available"})
 
-    graph = build_contagion_graph(corr_matrix, market_data)
+    # Fetch sentiment scores
+    try:
+        import asyncio
+        sentiment_data = asyncio.run(news_fetcher.get_batch_sentiment_scores(MONITORED_TICKERS))
+    except Exception:
+        sentiment_data = {}
+
+    graph = build_contagion_graph(corr_matrix, market_data, sentiment_data=sentiment_data)
     snapshots = simulate_contagion_spread(
         graph, shock_ticker, shock_magnitude, simulation_steps
     )

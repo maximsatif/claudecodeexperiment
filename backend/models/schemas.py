@@ -11,6 +11,7 @@ class GraphNode(BaseModel):
     status: str  # "healthy", "stressed", "critical"
     price_change_pct: float
     volume_anomaly: bool
+    sentiment_score: float = 0.0  # -1 (negative) to +1 (positive)
 
 
 class GraphEdge(BaseModel):

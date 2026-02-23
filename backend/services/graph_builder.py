@@ -35,9 +35,11 @@ def build_contagion_graph(
     correlation_matrix: pd.DataFrame,
     market_data: pd.DataFrame,
     threshold: float = CORRELATION_THRESHOLD,
+    sentiment_data: Optional[dict[str, float]] = None,
 ) -> ContagionGraph:
-    """Build a contagion graph from correlation matrix and market data."""
+    """Build a contagion graph from correlation matrix, market data, and sentiment."""
     G = nx.Graph()
+    sentiment_data = sentiment_data or {}
 
     # Create lookup for market data
     market_lookup = {}
@@ -56,8 +58,10 @@ def build_contagion_graph(
             float(md["volume_ratio"]) if hasattr(md, "__getitem__") and "volume_ratio" in md.index else 1
         )
 
-        # Compute risk score based on price change and volume anomaly
-        risk_score = _compute_node_risk_score(change_pct, vol_ratio)
+        ticker_sentiment = sentiment_data.get(ticker, 0.0)
+
+        # Compute risk score based on price change, volume anomaly, and sentiment
+        risk_score = _compute_node_risk_score(change_pct, vol_ratio, ticker_sentiment)
         status = _risk_to_status(risk_score)
         volume_anomaly = vol_ratio > 2.0
 
@@ -69,6 +73,7 @@ def build_contagion_graph(
             status=status,
             price_change_pct=change_pct,
             volume_anomaly=volume_anomaly,
+            sentiment_score=ticker_sentiment,
         )
         nodes.append(node)
         G.add_node(ticker, risk_score=risk_score)
@@ -187,13 +192,20 @@ def _state_snapshot(states: dict, step: int) -> dict:
     }
 
 
-def _compute_node_risk_score(change_pct: float, vol_ratio: float) -> float:
-    """Compute a risk score (0-100) from price change and volume data."""
+def _compute_node_risk_score(change_pct: float, vol_ratio: float, sentiment_score: float = 0.0) -> float:
+    """Compute a risk score (0-100) from price change, volume, and sentiment data."""
     # Price component: larger negative moves = higher risk
     price_risk = min(abs(change_pct) * 10, 50) if change_pct < 0 else max(0, abs(change_pct) * 3 - 5)
     # Volume component: unusual volume = higher risk
     volume_risk = min((vol_ratio - 1) * 15, 50) if vol_ratio > 1.5 else 0
-    return min(round(price_risk + volume_risk, 1), 100)
+    # Sentiment component: negative sentiment increases risk, positive reduces it
+    if sentiment_score < 0:
+        sentiment_risk = min(abs(sentiment_score) * 25, 25)
+    elif sentiment_score > 0:
+        sentiment_risk = -min(sentiment_score * 10, 10)
+    else:
+        sentiment_risk = 0
+    return min(max(round(price_risk + volume_risk + sentiment_risk, 1), 0), 100)
 
 
 def _risk_to_status(risk_score: float) -> str:

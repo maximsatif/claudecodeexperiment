@@ -8,19 +8,8 @@ from typing import Any
 from strands import Agent, tool
 from strands.models import BedrockModel
 
-from backend.config import BEDROCK_MODEL_ID, AWS_REGION
+from backend.config import BEDROCK_MODEL_ID, AWS_REGION, RISK_KEYWORDS, POSITIVE_KEYWORDS
 from backend.services.data_fetcher import news_fetcher
-
-
-RISK_KEYWORDS = [
-    "default", "bankruptcy", "insolvency", "margin call", "liquidity crisis",
-    "bank run", "contagion", "systemic risk", "credit downgrade", "debt ceiling",
-    "rate hike", "recession", "bear market", "crash", "collapse", "bailout",
-    "regulatory action", "SEC investigation", "fraud", "manipulation",
-    "counterparty risk", "exposure", "write-down", "impairment", "loss",
-    "volatility spike", "flash crash", "circuit breaker", "trading halt",
-    "stress test", "capital shortfall", "leverage", "deleveraging",
-]
 
 
 @tool
@@ -146,7 +135,7 @@ def analyze_sentiment_trend(ticker: str) -> str:
         })
 
     # Simple keyword-based sentiment scoring
-    positive_words = ["growth", "profit", "beat", "strong", "upgrade", "bullish", "gain", "rally"]
+    positive_words = POSITIVE_KEYWORDS
     negative_words = RISK_KEYWORDS
 
     pos_count = 0

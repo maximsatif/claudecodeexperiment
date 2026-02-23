@@ -137,14 +137,15 @@ async def get_macro_indicators():
 
 @app.get("/api/graph")
 async def get_contagion_graph(period: str = "6mo", threshold: float = 0.6):
-    """Build and return the contagion graph."""
+    """Build and return the contagion graph with sentiment-enhanced risk scores."""
     corr = market_data_fetcher.get_correlation_matrix(period=period)
     market_data = market_data_fetcher.get_current_prices()
 
     if corr.empty:
         raise HTTPException(status_code=503, detail="Unable to build graph")
 
-    graph = build_contagion_graph(corr, market_data, threshold=threshold)
+    sentiment_data = await news_fetcher.get_batch_sentiment_scores(MONITORED_TICKERS)
+    graph = build_contagion_graph(corr, market_data, threshold=threshold, sentiment_data=sentiment_data)
     return graph.model_dump()
 
 
@@ -157,7 +158,8 @@ async def simulate_shock(ticker: str, magnitude: float = 0.8, steps: int = 10):
     if corr.empty:
         raise HTTPException(status_code=503, detail="Unable to simulate")
 
-    graph = build_contagion_graph(corr, market_data)
+    sentiment_data = await news_fetcher.get_batch_sentiment_scores(MONITORED_TICKERS)
+    graph = build_contagion_graph(corr, market_data, sentiment_data=sentiment_data)
 
     # Validate ticker exists in graph
     node_ids = [n.id for n in graph.nodes]
@@ -223,7 +225,8 @@ async def get_risk_score():
     if corr.empty or market_data.empty:
         return {"systemic_risk_score": 0, "status": "data_unavailable"}
 
-    graph = build_contagion_graph(corr, market_data)
+    sentiment_data = await news_fetcher.get_batch_sentiment_scores(MONITORED_TICKERS)
+    graph = build_contagion_graph(corr, market_data, sentiment_data=sentiment_data)
 
     # Breakdown by sector
     sector_risk = {}

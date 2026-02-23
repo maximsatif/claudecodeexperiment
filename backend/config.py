@@ -44,6 +44,21 @@ FRED_SERIES = {
     "MOVE_INDEX": "MOVE",                  # Bond volatility
 }
 
+# Sentiment Analysis Keywords
+RISK_KEYWORDS = [
+    "default", "bankruptcy", "insolvency", "margin call", "liquidity crisis",
+    "bank run", "contagion", "systemic risk", "credit downgrade", "debt ceiling",
+    "rate hike", "recession", "bear market", "crash", "collapse", "bailout",
+    "regulatory action", "SEC investigation", "fraud", "manipulation",
+    "counterparty risk", "exposure", "write-down", "impairment", "loss",
+    "volatility spike", "flash crash", "circuit breaker", "trading halt",
+    "stress test", "capital shortfall", "leverage", "deleveraging",
+]
+
+POSITIVE_KEYWORDS = [
+    "growth", "profit", "beat", "strong", "upgrade", "bullish", "gain", "rally",
+]
+
 # Contagion Model Parameters
 SIR_INFECTION_RATE = 0.3    # Beta: rate of risk propagation
 SIR_RECOVERY_RATE = 0.1    # Gamma: rate of risk dissipation
