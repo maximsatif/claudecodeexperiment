@@ -1,0 +1,18 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "bedrock.amazonaws.com"
+      },
+      "Action": "lambda:InvokeFunction",
+      "Resource": "arn:aws:lambda:us-east-1:<YOUR_AWS_ACCOUNT_ID>:function:NewsSentimentAgentFunction",
+      "Condition": {
+        "StringEquals": {
+          "aws:SourceAccount": "<YOUR_AWS_ACCOUNT_ID>"
+        }
+      }
+    }
+  ]
+}

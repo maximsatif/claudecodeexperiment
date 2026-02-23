@@ -1,0 +1,161 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "News Sentiment Agent API",
+    "version": "1.0.0",
+    "description": "Action group for the Financial News & Sentiment Analysis Bedrock Agent. Provides tools to fetch company news, scan risk signals, and analyze sentiment trends."
+  },
+  "paths": {
+    "/get-company-news": {
+      "post": {
+        "operationId": "getCompanyNews",
+        "summary": "Fetch recent news articles for a specific company/ticker",
+        "description": "Retrieves the latest news articles for a given stock ticker symbol and checks each article for financial risk keywords such as default, bankruptcy, margin call, etc. Returns up to 10 articles with risk signal flags.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ticker": {
+                    "type": "string",
+                    "description": "The stock ticker symbol (e.g., 'JPM', 'BAC', 'GS', 'C', 'MS')"
+                  }
+                },
+                "required": ["ticker"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "News articles with risk signal analysis",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ticker": { "type": "string" },
+                    "articles": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "headline": { "type": "string" },
+                          "summary": { "type": "string" },
+                          "source": { "type": "string" },
+                          "datetime": { "type": "integer" },
+                          "risk_keywords": {
+                            "type": "array",
+                            "items": { "type": "string" }
+                          },
+                          "has_risk_signal": { "type": "boolean" }
+                        }
+                      }
+                    },
+                    "count": { "type": "integer" },
+                    "risk_article_count": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/scan-risk-signals": {
+      "post": {
+        "operationId": "scanRiskSignals",
+        "summary": "Scan news for multiple tickers and identify risk signals",
+        "description": "Scans recent news (last 3 days) for multiple financial tickers and identifies risk signals by checking for keywords like default, bankruptcy, contagion, margin call, etc. Returns risk ratios and key headlines for each ticker.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tickers": {
+                    "type": "string",
+                    "description": "Comma-separated list of stock ticker symbols to scan (e.g., 'JPM,BAC,C,GS,MS'). Maximum 10 tickers.",
+                    "default": "JPM,BAC,C,GS,MS"
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Risk signal analysis for each ticker",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "total_articles": { "type": "integer" },
+                      "risk_articles": { "type": "integer" },
+                      "risk_ratio": { "type": "number" },
+                      "key_headlines": {
+                        "type": "array",
+                        "items": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analyze-sentiment-trend": {
+      "post": {
+        "operationId": "analyzeSentimentTrend",
+        "summary": "Analyze the sentiment trend for a ticker based on recent news",
+        "description": "Analyzes the sentiment trend for a given ticker by examining news from the past 14 days. Uses keyword-based scoring with positive keywords (growth, profit, upgrade, etc.) and negative keywords (default, bankruptcy, crash, etc.) to compute a sentiment score from -1.0 (very negative) to +1.0 (very positive).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ticker": {
+                    "type": "string",
+                    "description": "The stock ticker symbol (e.g., 'JPM', 'BAC', 'GS')"
+                  }
+                },
+                "required": ["ticker"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sentiment analysis results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ticker": { "type": "string" },
+                    "sentiment_score": { "type": "number", "description": "Score from -1.0 to +1.0" },
+                    "sentiment": { "type": "string", "enum": ["positive", "neutral", "negative"] },
+                    "positive_signals": { "type": "integer" },
+                    "negative_signals": { "type": "integer" },
+                    "articles_analyzed": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
