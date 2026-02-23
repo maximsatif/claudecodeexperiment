@@ -81,7 +81,7 @@ class MarketDataFetcher:
             data = yf.download(tickers, period=period, progress=False, threads=True)
             if data.empty:
                 return pd.DataFrame()
-            return data["Close"].dropna(axis=1, how="all").fillna(method="ffill")
+            return data["Close"].dropna(axis=1, how="all").ffill()
         except Exception as e:
             print(f"Error fetching historical data: {e}")
             return pd.DataFrame()
